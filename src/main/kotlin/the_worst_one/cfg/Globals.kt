@@ -120,7 +120,7 @@ object Globals {
     private lateinit var items: List<Item>
     fun itemList(): List<Item> {
         if(!this::items.isInitialized) {
-            items = propertyList(Items::class.java).map { it as Item }
+            items = propertyList(Items::class.java).filter{it is Item} .map { it as Item }
         }
         return items
     }

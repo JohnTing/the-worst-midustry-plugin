@@ -112,7 +112,7 @@ class Filter(val users: Users, val ranks: Ranks, val logger: Logger, val config:
                         continue
                     }
 
-                    bytes[i] = bytes[i].toLowerCase()
+                    bytes[i] = bytes[i].lowercaseChar()
                 }
                 s = bytes.concatToString()
             }

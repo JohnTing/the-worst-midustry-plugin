@@ -71,7 +71,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
     }
 
     class Stats (
-        val bullet: String = "standardCopper", //bullet type
+        val bullet: String = "dagger-0", //bullet type
         val inaccuracy: Float = 2f, // in degrees
         val damageMultiplier: Float = 1f,
         val reload: Float = .3f, // in seconds
@@ -96,7 +96,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
         init {
             // finding bullet with biggest range
             ut?.weapons?.forEach {
-                if (!this::original.isInitialized || original.range() < it.bullet.range()) {
+                if (!this::original.isInitialized || original.range < it.bullet.range) {
                     original = it.bullet
                 }
             }
@@ -108,7 +108,6 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
 
         fun shoot(unit: Unit, state: State) {
             if (state.reload < stats.reload) {
-                println(6)
                 return
             }
             state.reload = 0f
@@ -129,7 +128,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
 
         fun shoot(aim: Vec2, pos: Vec2, vel: Vec2, team: Team, d: State) {
             h1
-                .set(original.range(), 0f) // set length to range
+                .set(original.range, 0f) // set length to range
                 .rotate(h2.set(aim).sub(pos).angle()) // rotate to shooting direction
                 .add(h3.set(vel).scl(60f * Time.delta)) // add velocity offset
 
@@ -139,7 +138,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
             val dir = h1.angle()
             if (!bullet.collides) {
                 // h2 is already in state of vector from u.pos to u.aim and we only care about length
-                life *= (h2.len() / bullet.range()).coerceAtMost(1f) // bullet is controlled by cursor
+                life *= (h2.len() / bullet.range).coerceAtMost(1f) // bullet is controlled by cursor
             }
             for (i in 0 until stats.bulletsPerShot) {
                 Call.createBullet(

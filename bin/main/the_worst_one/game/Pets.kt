@@ -85,7 +85,7 @@ class Pets(val users: Users, val logger: Logger, override var configPath: String
                 user.inner.team(),
                 p.pos.x,
                 p.pos.y,
-                weapon.bullet.range()
+                weapon.bullet.range
             ) { true } ?: return
 
             Predict.intercept(

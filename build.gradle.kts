@@ -12,7 +12,7 @@ repositories {
     maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
-val mindVer = "v129.1"
+val mindVer = "v136.1"
 val utilsVer = "v0.4.3"
 val exposedVer = "0.31.1"
 val junitVersion = "5.6.1"

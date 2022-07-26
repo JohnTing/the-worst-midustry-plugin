@@ -30,7 +30,7 @@ class Search(val ranks: Ranks): Command("search") {
                         }
 
                         transaction {
-                            Driver.Users.select { Driver.Users.name.lowerCase() like "${u[0].toLowerCase()}%" }.limit(limit.toInt(), offset = offset).forEach {
+                            Driver.Users.select { Driver.Users.name.lowerCase() like "${u[0].lowercase()}%" }.limit(limit.toInt(), offset = offset).forEach {
                                 sb.append(string(it[Driver.Users.id], it[Driver.Users.name], ranks[it[Driver.Users.rank]])).append("\n")
                             }
                         }

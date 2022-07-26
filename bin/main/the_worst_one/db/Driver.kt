@@ -26,7 +26,7 @@ import java.util.*
 import kotlin.math.max
 
 // Driver handles all database calls and holds information about the_worst_one.db structure
-class Driver(override var configPath: String = "config/driver.json", val ranks: Ranks = Ranks()): Reloadable {
+class Driver(override var configPath: String = "databaseDriver/config.json", val ranks: Ranks = Ranks()): Reloadable {
     var config = Config()
     private lateinit var con: Database
     private val outlook = Lookout()
@@ -49,7 +49,9 @@ class Driver(override var configPath: String = "config/driver.json", val ranks: 
         }
 
         println("driver:: connecting to database...")
-        val url = String.format("jdbc:postgresql:%s", config.database)
+        //"jdbc:postgresql://localhost:12346/test"
+        val url = "jdbc:postgresql://${config.host}:${config.port}/${config.database}"
+        println("url:" + url)
         con = Database.connect(url, user = config.user, password = config.password)
         println("driver:: connected")
 
@@ -346,8 +348,10 @@ class Driver(override var configPath: String = "config/driver.json", val ranks: 
     // Config holds database config
     class Config(
         var user: String = "postgres",
-        var password: String = "twstest123",
-        var database: String = "gee",
+        var password: String = "postgres_password",
+        var database: String = "tws",
+        var host: String = "localhost",
+        var port: Int = 5432,
         var verbose: Boolean = false,
         val multiplier: Stats = Stats(),
     )

@@ -30,8 +30,11 @@ class Configure(val targets: Map<String, Reloadable>): Command("configure", Rank
         }
 
         val r = when(args.size) {
-            5 -> target.modify(args[1].capitalize(), args[2].capitalize(), args[3], args[4])
-            3 -> target.modify(args[1].capitalize(), "Null", args[2], "")
+            5 -> target.modify(
+            args[1].replaceFirstChar(Char::titlecase), 
+            args[2].replaceFirstChar(Char::titlecase), 
+            args[3], args[4])
+            3 -> target.modify(args[1].replaceFirstChar(Char::titlecase), "Null", args[2], "")
             else -> {
                 send("configure.count")
                 return Result.Count

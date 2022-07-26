@@ -3,6 +3,13 @@
 This is yet another rewrite of a plugin for TWS server. This time around though, I decided to 
 write it in kotlin. It turned out to be the best decision I ever made. 
 
+
+## build
+```sh
+./gradlew jar 
+```
+The created jar file is located in `build/libs` directory.
+
 ## setup
 
 Plugin is now using postgres sql so in order to use it you have to have it installed. When server 
@@ -10,6 +17,8 @@ is first run, it will probably crash due to invalid password. You have to go to 
 gets created automatically. Config file should look similar to this.
 ```json
 {
+  "host": "localhost", 
+  "port": 5432, 
   "database" : "mtest", 
   "password" : "helloThere", 
   "user" : "postgres"
@@ -110,6 +119,7 @@ Config defines behavior of the database.
 ```json
 {
   "database": "mtest",
+  "host": "localhost", 
   "multiplier": {
     "built": 100,
     "commands": 0,
@@ -123,6 +133,7 @@ Config defines behavior of the database.
     "wins": 1000
   },
   "password": "",
+  "port": 5432, 
   "user": "postgres"
 }
 ```

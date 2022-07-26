@@ -131,3 +131,4 @@ gradle-app.setting
 password.txt
 config/
 testData/
+logOutput/
