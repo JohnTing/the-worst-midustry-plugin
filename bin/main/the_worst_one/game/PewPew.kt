@@ -12,9 +12,10 @@ import mindustry.entities.bullet.BulletType
 import mindustry_plugin_utils.Logger
 import the_worst_one.cfg.Reloadable
 import mindustry.game.EventType
+import mindustry.game.Team
 import mindustry.gen.Call
 import mindustry.gen.Unit
-import mindustry.gen.UnitEntity.units
+import mindustry.gen.Groups
 import mindustry.type.Item
 import mindustry.type.UnitType
 import mindustry.type.Weapon
@@ -56,14 +57,15 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
     }
 
     private fun update() {
-        for(u in units) {
+        for(u in Groups.unit) {
             val unit = u ?: continue
-            if(unit.hasItem()) {
-                val set = weaponSets[unit.type] ?: continue
-                val weapon = set[unit.stack.item] ?: continue
-                val state = state.computeIfAbsent(unit) { pool.pop { State() } }
-                state.reload += Time.delta() / 60f 
-                if(unit.isShooting) weapon.shoot(unit, state)
+            if(!unit.hasItem()) continue
+            val set = weaponSets[unit.type] ?: continue
+            val weapon = set[unit.stack.item] ?: continue
+            val state = state.computeIfAbsent(unit) { pool.pop { State() } }
+            state.reload += Time.delta / 60f
+            if(unit.isShooting) {
+                weapon.shoot(unit, state)
             }
         }
     }
@@ -78,8 +80,8 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
         val itemsPerScoop: Int = 1,
     )
 
-    class Weapon(private val stats: Stats, ut: UnitType, name: String) {
-        private var bullet: BulletType = try {
+    class Weapon(val stats: Stats, ut: UnitType? = null, name: String = "ambiguos") {
+        var bullet: BulletType = try {
             if (stats.bullet.contains("-")) {
                 Globals.unitBullet(stats.bullet, ut)
             } else {
@@ -93,7 +95,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
 
         init {
             // finding bullet with biggest range
-            ut.weapons.forEach {
+            ut?.weapons?.forEach {
                 if (!this::original.isInitialized || original.range() < it.bullet.range()) {
                     original = it.bullet
                 }
@@ -105,22 +107,24 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
         }
 
         fun shoot(unit: Unit, state: State) {
-            if (d.reload < stats.reload) {
+            if (state.reload < stats.reload) {
+                println(6)
                 return
             }
-            d.reload = 0f
+            state.reload = 0f
+
             // refilling ammo
-            if (d.ammo == 0) {
+            if (state.ammo == 0) {
                 // not enough items to get new ammo
-                if (u.stack.amount < stats.itemsPerScoop) {
+                if (unit.stack.amount < stats.itemsPerScoop) {
                     return
                 }
-                u.stack.amount -= stats.itemsPerScoop
-                d.ammo += stats.ammoMultiplier
+                unit.stack.amount -= stats.itemsPerScoop
+                state.ammo += stats.ammoMultiplier
             }
-            d.ammo--
+            state.ammo--
 
-            shoot(h4.set(unit.aimX, unit.aimY), h5.set(unit.x, unit.y), h6.set(unit.velocity()))
+            shoot(h4.set(unit.aimX, unit.aimY), h5.set(unit.x, unit.y), unit.vel, unit.team, state)
         }
 
         fun shoot(aim: Vec2, pos: Vec2, vel: Vec2, team: Team, d: State) {
@@ -130,12 +134,12 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
                 .add(h3.set(vel).scl(60f * Time.delta)) // add velocity offset
 
             // its math
-            val vel = h1.len() / original.lifetime / bullet.speed
+            val velLen = h1.len() / original.lifetime / bullet.speed
             var life = original.lifetime / bullet.lifetime
             val dir = h1.angle()
             if (!bullet.collides) {
                 // h2 is already in state of vector from u.pos to u.aim and we only care about length
-                life *= Math.min(h2.len() / bullet.range(), 1f) // bullet is controlled by cursor
+                life *= (h2.len() / bullet.range()).coerceAtMost(1f) // bullet is controlled by cursor
             }
             for (i in 0 until stats.bulletsPerShot) {
                 Call.createBullet(
@@ -144,7 +148,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
                     pos.x, pos.y,
                     dir + Mathf.range(-stats.inaccuracy, stats.inaccuracy),  // apply inaccuracy
                     stats.damageMultiplier * bullet.damage,
-                    vel,
+                    velLen,
                     life
                 )
             }
@@ -157,7 +161,6 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
             var h3 = Vec2()
             var h4 = Vec2()
             var h5 = Vec2()
-            var h6 = Vec2()
         }
 
 
