@@ -117,9 +117,9 @@ class Docks(val users: Users, logger: Logger, override var configPath: String) :
     }
 
     class Config(
-        val returnTime: Long = 60 * 3,
+        val returnTime: Long = 60L * 3,
         val shipCapacity: Int = 5000,
         val shipCount: Int = 3,
-        val rebuildTime: Long = 60 * 60,
+        val rebuildTime: Long = 60L * 60,
     )
 }

@@ -35,6 +35,22 @@ class Filter(val users: Users, val ranks: Ranks, val logger: Logger, val config:
 
         logger.on(EventType.BlockBuildEndEvent::class.java) { if(it.breaking) map.unlock(it.tile) }
 
+        logger.on(EventType.PickupEvent::class.java) {
+            val tile = it.build?.tile ?: return@on
+            val player = it.carrier?.player ?: return@on
+
+            val user = users[player.uuid()]!!
+            inspect.denote(tile, user.data, ActionType.breakBlock)
+        }
+        logger.on(EventType.PayloadDropEvent::class.java) {
+            val tile = it.build?.tile ?: return@on
+            val player = it.carrier?.player ?: return@on
+
+            val user = users[player.uuid()]!!
+            inspect.denote(tile, user.data, ActionType.placeBlock)
+        }
+
+
         logger.run(EventType.Trigger.update) {
             users.forEach { _, u ->
                 if(u.data.rank.control.spectator() && u.inner.shooting) {
@@ -84,6 +100,7 @@ class Filter(val users: Users, val ranks: Ranks, val logger: Logger, val config:
             when(it.type) {
                 ActionType.breakBlock -> map.unlock(it.tile)
                 ActionType.placeBlock -> map.update(it.tile, user)
+
                 else -> {}
             }
 

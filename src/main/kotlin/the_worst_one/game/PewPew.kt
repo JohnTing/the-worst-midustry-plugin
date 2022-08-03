@@ -71,7 +71,7 @@ class PewPew(val logger: Logger, val users: Users, override var configPath: Stri
     }
 
     class Stats (
-        val bullet: String = "dagger-0", //bullet type
+        val bullet: String = "dagger-1", //bullet type
         val inaccuracy: Float = 2f, // in degrees
         val damageMultiplier: Float = 1f,
         val reload: Float = .3f, // in seconds
